@@ -54,6 +54,8 @@ where
 
 /// Does this backend support `RETURNING` clauses?
 pub trait SupportsReturningClause {}
+/// Does this backend support 'ON CONFLICT' clause?
+pub trait SupportsOnConflictClause {}
 /// Does this backend support the bare `DEFAULT` keyword?
 pub trait SupportsDefaultKeyword {}
 /// Does this backend use the standard `SAVEPOINT` syntax?

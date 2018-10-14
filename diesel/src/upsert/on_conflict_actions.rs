@@ -1,5 +1,5 @@
+use backend::{Backend, SupportsOnConflictClause};
 use expression::{AppearsOnTable, Expression};
-use pg::Pg;
 use query_builder::*;
 use query_source::*;
 use result::QueryResult;
@@ -13,8 +13,8 @@ pub fn excluded<T>(excluded: T) -> Excluded<T> {
 #[derive(Debug, Clone, Copy)]
 pub struct DoNothing;
 
-impl QueryFragment<Pg> for DoNothing {
-    fn walk_ast(&self, mut out: AstPass<Pg>) -> QueryResult<()> {
+impl<DB: Backend + SupportsOnConflictClause> QueryFragment<DB> for DoNothing {
+    fn walk_ast(&self, mut out: AstPass<DB>) -> QueryResult<()> {
         out.push_sql(" DO NOTHING");
         Ok(())
     }
@@ -32,11 +32,12 @@ impl<T> DoUpdate<T> {
     }
 }
 
-impl<T> QueryFragment<Pg> for DoUpdate<T>
+impl<DB, T> QueryFragment<DB> for DoUpdate<T>
 where
-    T: QueryFragment<Pg>,
+    DB: Backend + SupportsOnConflictClause,
+    T: QueryFragment<DB>,
 {
-    fn walk_ast(&self, mut out: AstPass<Pg>) -> QueryResult<()> {
+    fn walk_ast(&self, mut out: AstPass<DB>) -> QueryResult<()> {
         out.unsafe_to_cache_prepared();
         if self.changeset.is_noop()? {
             out.push_sql(" DO NOTHING");
@@ -52,11 +53,12 @@ where
 #[derive(Debug, Clone, Copy)]
 pub struct Excluded<T>(T);
 
-impl<T> QueryFragment<Pg> for Excluded<T>
+impl<DB, T> QueryFragment<DB> for Excluded<T>
 where
+    DB: Backend + SupportsOnConflictClause,
     T: Column,
 {
-    fn walk_ast(&self, mut out: AstPass<Pg>) -> QueryResult<()> {
+    fn walk_ast(&self, mut out: AstPass<DB>) -> QueryResult<()> {
         out.push_sql("excluded.");
         try!(out.push_identifier(T::NAME));
         Ok(())

@@ -1,4 +1,3 @@
-use backend::{Backend, SupportsOnConflictClause};
 use super::on_conflict_actions::*;
 use super::on_conflict_clause::*;
 use super::on_conflict_target::*;
@@ -166,13 +165,12 @@ where
     ///
     /// [`on_constraint`]: ../upsert/fn.on_constraint.html
     /// [`do_update`]: ../upsert/struct.IncompleteOnConflict.html#method.do_update
-    pub fn on_conflict<DB, Target>(
+    pub fn on_conflict<Target>(
         self,
         target: Target,
     ) -> IncompleteOnConflict<Self, ConflictTarget<Target>>
     where
-        DB: Backend + SupportsOnConflictClause,
-        ConflictTarget<Target>: OnConflictTarget<DB, T>,
+        ConflictTarget<Target>: OnConflictTarget<T>,
     {
         IncompleteOnConflict {
             stmt: self,

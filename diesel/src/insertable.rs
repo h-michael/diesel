@@ -5,8 +5,6 @@ use expression::{AppearsOnTable, Expression};
 use query_builder::{AstPass, InsertStatement, QueryFragment, UndecoratedInsertRecord, ValuesClause};
 use query_source::{Column, Table};
 use result::QueryResult;
-#[cfg(feature = "sqlite")]
-use sqlite::Sqlite;
 
 /// Represents that a structure can be used to insert a new row into the
 /// database. This is automatically implemented for `&[T]` and `&Vec<T>` for
@@ -169,34 +167,6 @@ where
             value.walk_ast(out.reborrow())?;
         } else {
             out.push_sql("DEFAULT");
-        }
-        Ok(())
-    }
-}
-
-#[cfg(feature = "sqlite")]
-impl<Col, Expr> InsertValues<Col::Table, Sqlite> for ColumnInsertValue<Col, Expr>
-where
-    Col: Column,
-    Expr: Expression<SqlType = Col::SqlType> + AppearsOnTable<()>,
-    Self: QueryFragment<Sqlite>,
-{
-    fn column_names(&self, mut out: AstPass<Sqlite>) -> QueryResult<()> {
-        if let ColumnInsertValue::Expression(..) = *self {
-            out.push_identifier(Col::NAME)?;
-        }
-        Ok(())
-    }
-}
-
-#[cfg(feature = "sqlite")]
-impl<Col, Expr> QueryFragment<Sqlite> for ColumnInsertValue<Col, Expr>
-where
-    Expr: QueryFragment<Sqlite>,
-{
-    fn walk_ast(&self, mut out: AstPass<Sqlite>) -> QueryResult<()> {
-        if let ColumnInsertValue::Expression(_, ref value) = *self {
-            value.walk_ast(out.reborrow())?;
         }
         Ok(())
     }

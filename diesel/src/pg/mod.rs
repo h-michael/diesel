@@ -7,7 +7,7 @@
 pub mod expression;
 pub mod types;
 #[deprecated(since = "1.4.0", note = "Use `diesel::upsert` instead")]
-pub use upsert;
+pub use super::upsert;
 
 mod backend;
 mod connection;
@@ -15,6 +15,7 @@ mod metadata_lookup;
 mod query_builder;
 pub(crate) mod serialize;
 mod transaction;
+pub mod on_constraint;
 
 pub use self::backend::{Pg, PgTypeMetadata};
 pub use self::connection::PgConnection;

@@ -5,7 +5,7 @@ use query_source::Column;
 use result::QueryResult;
 
 #[cfg(feature = "postgres")]
-pub use pg::on_constraint;
+pub use pg::on_constraint::*;
 
 #[doc(hidden)]
 pub trait OnConflictTarget<Table> {}

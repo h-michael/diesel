@@ -8,6 +8,14 @@ rust:
 cache: cargo
 addons:
   postgresql: '9.5'
+before_install:
+ # install sqlite3 version 3.25.2
+  - |
+    if [[ "$BACKEND" == sqlite ]]; then
+      (sudo apt-get update; sudo apt-get remove sqlite3) &&
+      (wget --quiet -c https://www.sqlite.org/2018/sqlite-autoconf-3250200.tar.gz) &&
+      (tar zxf sqlite-autoconf-3250200.tar.gz; cd sqlite-autoconf-3250200; ./configure; sudo make; sudo make install; cd)
+    fi
 before_script:
   - pip install 'travis-cargo<0.2' --user
   - export PATH=$HOME/.local/bin:$PATH

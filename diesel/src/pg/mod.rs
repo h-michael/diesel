@@ -12,10 +12,10 @@ pub use super::upsert;
 mod backend;
 mod connection;
 mod metadata_lookup;
+pub(crate) mod on_constraint;
 mod query_builder;
 pub(crate) mod serialize;
 mod transaction;
-pub(crate) mod on_constraint;
 
 pub use self::backend::{Pg, PgTypeMetadata};
 pub use self::connection::PgConnection;
